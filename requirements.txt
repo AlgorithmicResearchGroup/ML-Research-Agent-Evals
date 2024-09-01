@@ -1,0 +1,15 @@
+click
+torch==2.0.0
+tabulate
+matplotlib
+evaluate
+datasets
+transformers
+tqdm
+bitsandbytes
+onnx
+onnxruntime
+urllib3<2
+rouge_score
+protobuf==3.20.2
+accelerate

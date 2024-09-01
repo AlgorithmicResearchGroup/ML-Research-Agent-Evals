@@ -1,0 +1,40 @@
+[project]
+name = "agent-eval"
+version = "0.1"
+description = "evaluation cli for ai_research_benchmark"
+readme = "README.md"
+authors = [{name = "ArtifactAI"}]
+license = {text = "Apache-2.0"}
+requires-python = ">=3.8"
+classifiers = [
+    "License :: OSI Approved :: Apache Software License"
+]
+dependencies = [
+    "click",
+    "torch==2.0.0",
+    "tabulate",
+    "matplotlib",
+    "evaluate",
+    "datasets",
+    "transformers",
+    "tqdm",
+    "bitsandbytes",
+    "onnx",
+    "onnxruntime",
+    "urllib3<2",
+    "rouge_score",
+    "protobuf==3.20.1", # required by onnx
+    "accelerate",
+]
+
+[project.urls]
+Homepage = "https://github.com/ArtifactAI/agent-eval"
+Changelog = "https://github.com/ArtifactAI/agent-eval/releases"
+Issues = "https://github.com/ArtifactAI/agent-eval/issues"
+CI = "https://github.com/ArtifactAI/agent-eval/actions"
+
+[project.entry-points.console_scripts]
+agent-eval = "agent_eval.cli:cli"
+
+[project.optional-dependencies]
+test = ["pytest"]
