@@ -7,13 +7,13 @@ import click
 from rich.console import Console
 from rich.table import Table
 import matplotlib.pyplot as plt
-from benchmarks.latency import LatencyBenchmark
-from benchmarks.parameters import CountParametersBenchmark
-from benchmarks.perplexity import PerplexityBenchmark
-from benchmarks.tokens_per_second import TokensPerSecondBenchmark
-from benchmarks.bleu import BLEUScoreBenchmark
-from benchmarks.rouge_l import RougeScoreBenchmark
-from load_model import load_test_model
+from agent_eval.benchmarks.latency import LatencyBenchmark
+from agent_eval.benchmarks.parameters import CountParametersBenchmark
+from agent_eval.benchmarks.perplexity import PerplexityBenchmark
+from agent_eval.benchmarks.tokens_per_second import TokensPerSecondBenchmark
+from agent_eval.benchmarks.bleu import BLEUScoreBenchmark
+from agent_eval.benchmarks.rouge_l import RougeScoreBenchmark
+from agent_eval.load_model import load_test_model
 
 
 model_metrics = [
@@ -178,20 +178,29 @@ def cli(model_args, task, bits, use_ort, quantized):
         print("Latency benchmark complete")
         
         rubric_results.append(["latency", latency_result['avg']])
-
-    if "mmlu" in tasks[task]:
-        print("Starting MMLU benchmark")
-        benchmark_name = (
-            "high_school_mathematics"  # Replace with the desired MMLU benchmark name
-        )
-        mmlu_benchmark = MMLUBenchmark(
-            model, tokenizer, benchmark_name, num_samples=100
-        )
-        accuracy = mmlu_benchmark.benchmark()
-        results.append(["MMLU Accuracy", f"{accuracy:.4f}"])
-        print("MMLU benchmark complete")
         
-        rubric_results.append(["mmlu", accuracy])
+    ########################################### bleu #################################################################
+    if "bleu" in tasks[task]:
+        print("Starting BLEU benchmark")
+        bleu_benchmark = BLEUScoreBenchmark(model, tokenizer, dataset_path="data/math_problems.json")
+        bleu_score = bleu_benchmark.benchmark_bleu_score()
+        results.append(["BLEU Score", f"{bleu_score:.4f}"])
+        print("BLEU benchmark complete")
+        
+        rubric_results.append(["bleu", bleu_score])
+        
+    ########################################### rouge_l #################################################################
+    if "rouge_l" in tasks[task]:
+        print("Starting Rouge-L benchmark")
+        rouge_l_benchmark = RougeScoreBenchmark(model, tokenizer, dataset_path="data/math_problems.json")
+        rouge_l_score = rouge_l_benchmark.benchmark_rouge_l_score()
+        results.append(["Rouge-1 Score", f"{rouge_l_score['rouge1']:.4f}"])
+        results.append(["Rouge-2 Score", f"{rouge_l_score['rouge2']:.4f}"])
+        results.append(["Rouge-L Score", f"{rouge_l_score['rougeL']:.4f}"])
+        print("Rouge-L benchmark complete")
+        
+        rubric_results.append(["rouge_l", rouge_l_score])
+        
 
     print("\n")
     print("Benchmark Results:")
