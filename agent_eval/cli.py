@@ -11,6 +11,8 @@ from benchmarks.latency import LatencyBenchmark
 from benchmarks.parameters import CountParametersBenchmark
 from benchmarks.perplexity import PerplexityBenchmark
 from benchmarks.tokens_per_second import TokensPerSecondBenchmark
+from benchmarks.bleu import BLEUScoreBenchmark
+from benchmarks.rouge_l import RougeScoreBenchmark
 from load_model import load_test_model
 
 
@@ -70,22 +72,6 @@ tasks = {
     "mini_edge_llm_training": ["latency", "tokens_per_second", "parameters", "perplexity"],
     "mini_math_reasoning": ["latency", "tokens_per_second", "parameters", "perplexity"],
 }
-
-
-
-
-def plot_results(metrics, model_name, task):
-    plt.figure(figsize=(10, 5))
-    for metric, values in metrics.items():
-        plt.plot(values, label=metric)
-    plt.title(f'Benchmark Results for {model_name} - {task}')
-    plt.xlabel('Benchmarks')
-    plt.ylabel('Values')
-    plt.legend()
-    plt.grid(True)
-    plt.savefig(f'{model_name}_{task}_benchmark_results.png')
-    plt.show()
-
 
 
 def print_markdown_table(results):

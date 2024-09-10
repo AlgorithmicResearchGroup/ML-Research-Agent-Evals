@@ -8,8 +8,8 @@ setup(
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     install_requires=open('requirements.txt').read().splitlines(),
-    author='ArtifactAI',  # Your name or your organization's name
-    author_email='matt@artifactai.com',  # Your email or your organization's email
+    author='Algorithmic Research Group',  # Your name or your organization's name
+    author_email='matt@algorithmicresearchgroup.com',  # Your email or your organization's email
     keywords='Eval',  # Keywords to find your library
     url='http://github.com/yourusername/your_library',  # URL to your library's repository
     entry_points={

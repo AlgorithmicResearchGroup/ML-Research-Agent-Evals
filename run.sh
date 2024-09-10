@@ -30,6 +30,11 @@ fi
 # Update the python command to use the correct path
 PYTHON_CMD="cd /app && python agent_eval/cli.py"
 
+
+########################################################
+# 1. LLM Efficiency
+########################################################
+
 # Add other task conditions
 if [[ "$1" == *"llm_efficiency"* || "$1" == *"mini_llm_efficiency"* ]]
 then
@@ -44,6 +49,10 @@ then
 
 fi
 
+########################################################
+# 2. BabyLM
+########################################################
+
 if [[ "$1" == *"baby_lm"* || "$1" == *"mini_baby_lm"* ]]
 then
     echo "Running baby_lm"
@@ -56,6 +65,11 @@ then
     --batch_size 8
 fi
 
+
+########################################################
+# 3. MiniPile
+########################################################
+
 if [[ "$1" == *"mini_pile"* || "$1" == *"mini_mini_pile"* ]]
 then
     echo "Running mini_pile"
@@ -63,23 +77,14 @@ then
 
     lm_eval --model hf \
     --model_args pretrained="$2" \
-    --tasks glue \
+    --tasks super_glue \
     --device cuda:0 \
     --batch_size 8
 fi
 
-if [[ "$1" == *"budget_model_training"* || "$1" == *"mini_budget_model_training"* ]]
-then
-    echo "Running budget_model_training"
-    python agent_eval/cli.py --model_args "$2" --task budget_model_training
-fi
-
-if [[ "$1" == *"budget_model_inference"* || "$1" == *"mini_budget_model_inference"* ]]
-then
-    echo "Running budget_model_inference"
-        python agent_eval/cli.py --model_args "$2" --task budget_model_inference
-fi
-
+########################################################
+# 4. LLM Merging
+########################################################
 
 if [[ "$1" == *"llm_merging"* || "$1" == *"mini_llm_merging"* ]]
 then
@@ -92,6 +97,10 @@ then
     --device cuda:0 \
     --batch_size 8
 fi
+
+########################################################
+# 5. Edge LLM Compression
+########################################################
 
 if [[ "$1" == *"edge_llm_compression"* || "$1" == *"mini_edge_llm_compression"* ]]
 then
@@ -106,6 +115,11 @@ then
     --batch_size 8
 fi
 
+
+########################################################
+# 6. Edge LLM Training
+########################################################
+
 if [[ "$1" == *"edge_llm_training"* || "$1" == *"mini_edge_llm_training"* ]]
 then
     echo "Running edge_llm_training"
@@ -118,6 +132,9 @@ then
     --batch_size 8
 fi
 
+########################################################
+# 7. Math Reasoning
+########################################################
 
 if [[ "$1" == *"math_reasoning"* || "$1" == *"mini_math_reasoning"* ]]
 then
@@ -130,6 +147,28 @@ then
     --device cuda:0 \
     --batch_size 8
 fi
+
+########################################################
+# 8. Budget Model Train
+########################################################
+
+if [[ "$1" == *"budget_model_training"* || "$1" == *"mini_budget_model_training"* ]]
+then
+    echo "Running budget_model_training"
+    python agent_eval/cli.py --model_args "$2" --task budget_model_training
+fi
+
+########################################################
+# 9. Budget Model Inference
+########################################################
+
+if [[ "$1" == *"budget_model_inference"* || "$1" == *"mini_budget_model_inference"* ]]
+then
+    echo "Running budget_model_inference"
+        python agent_eval/cli.py --model_args "$2" --task budget_model_inference
+fi
+
+
 
 echo "Evaluation complete"
 
