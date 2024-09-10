@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='agent-eval',  # Replace with your library name
-    version='0.0.11',  # Version of your library
+    version='0.0.12',  # Version of your library
     packages=find_packages(),
     description='An eval package for AI Research Bench',  # Provide a short description
     long_description=open('README.md').read(),
