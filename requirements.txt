@@ -1,5 +1,4 @@
 click
-torch==2.0.0
 tabulate
 matplotlib
 evaluate
@@ -13,3 +12,5 @@ urllib3<2
 rouge_score
 protobuf==3.20.2
 accelerate
+rich
+optimum

@@ -4,75 +4,92 @@ Agent-Eval is a tool for evaluating the performance of an agent on a set of task
 
 Evaluations can either be performed manually or automatically. The manual evaluation process involves running the agent on each task and manually executing the evaluation script to evaluate its performance based on predefined metrics. The automatic evaluation process involves using a library to calculate evaluation metrics, generate evaluation reports, and visualize the results.
 
-### Manual Evaluation
+## Setup
 
-To manually evaluate the agent's performance, follow these steps:
+1. Build the Docker image:
+   ```
+   docker build -t agent-eval .
+   ```
 
-1. Run the agent on each task.
-2. Execute the evaluation script `eval.py` to calculate the evaluation metrics.
-3. Review the evaluation report to assess the agent's performance on each task.
-
-
-The evaluation script provides detailed information on the agent's performance per task, including metrics such as perplexity, accuracy, and latency. It also generates visualizations to help visualize the results.
-
-
-### Automatic Evaluation
-Optionally, we provide a library that can be integrated into the agent's codebase to facilitate the evaluation process. The library includes functions for calculating evaluation metrics, generating evaluation reports, and visualizing the results. 
+2. Run the evaluation for a specific task:
+   ```
+   docker run -v [task_name] [model_path] [results_output_path]
 
 
-To integrate the evaluation library into the agent's codebase, follow these steps:
+   docker run -it agent-eval \
+    --gpus all \
+    -e NVIDIA_VISIBLE_DEVICES=0 \
+    -e TASK_NAME="mini_mini_pile" \
+    -e MODEL_PATH="gpt2" \ 
+   ```
 
-1. Install the evaluation library using pip:
+   example:
+    ```
+  docker run llm_efficiency gpt2 .
+   ```
 
-```bash
-pip install agent-eval
-```
+   Replace `[task_name]` with one of the available tasks, `[model_path]` with the path to your model, and `[results_output_path]` with the desired output location for results.
 
-## Usage
+## Available Tasks
 
-For help on how to use the tool, run:
-```bash
-agent-eval --help
-```
+The following tasks are now available:
 
+- llm_efficiency
+- baby_lm
+- mini_pile
+- budget_model_training
+- budget_model_inference
+- llm_merging
+- edge_llm_compression
+- edge_llm_training
+- math_reasoning
 
-you can also run the tool as a module:
-```bash
-python -m agent_eval --help
-```
+Each task also has a "mini" version prefixed with "mini_".
 
-The tool requires the following arguments:
-- `model_path (required)`: Path to the model
-- `task (required)`: Task to perform
-- `bits (optional)`: True if the model is quantized with bitsandbytes
-- `use_ort (optional)`: True if the model is quantized with ORT
-- `quantized (optional)`: True if the model is quantized 
+## Evaluation Process
 
+For each task, the evaluation now consists of two parts:
+
+1. Custom `agent_eval` metrics:
+   - Latency
+   - Tokens per second
+   - Parameter count
+   - Perplexity
+
+2. Task-specific `lm-eval-harness` benchmarks:
+   - For `llm_efficiency`: hellaswag
+   - For `baby_lm`: hellaswag, gsm8k, arc, mmlu, blimp
+   - For `mini_pile`: glue
+   - For `llm_merging`, `edge_llm_compression`, `edge_llm_training`: mmlu
+   - For `mini_math_reasoning`: mmlu_high_school_mathematics, mmlu_high_school_statistics, mmlu_high_school_computer_science
+
+## Results
+
+The evaluation will output results in two formats:
+
+1. Custom `agent_eval` metrics will be displayed in a markdown table format in the console.
+2. `lm-eval-harness` results will be saved to the specified output path.
 
 ## Example
-```bash 
-agent-eval --model_path /path/to/model --task task_name --bits 8 --use_ort True --quantized True
-```
 
-The results of the evaluation will be saved in the `results` directory. The evaluation report will be saved in the `results` directory as a `.json` file. Running the task will also print the evaluation report to the console, e.g.:
+To run the `llm_efficiency` task on a model:
 
 
-## Development
+```
+docker run -v /path/to/models:/models agent-eval llm_efficiency /models/my_model 
+```
 
-To contribute to this tool, first checkout the code. Then create a new virtual environment:
-```bash
-cd agent-eval
-python -m venv venv
-source venv/bin/activate
-```
-Now install the dependencies and test dependencies:
-```bash
-pip install -e '.[test]'
-```
-To run the tests:
-```bash
-pytest
-```
+This will:
+1. Run the custom `agent_eval` metrics (latency, tokens per second, parameters, perplexity)
+2. Run the hellaswag benchmark using `lm-eval-harness`
+3. Display the custom metrics in the console
+
+## Note
+
+- Ensure that you have sufficient GPU resources available when running GPU-based evaluations.
+- The evaluation process now includes more comprehensive benchmarks, which may take longer to complete depending on the task and model size.
+- Review the `run.sh` script for any task-specific configurations or additional benchmarks that may be run for each task.
+
 
 
 

@@ -4,16 +4,14 @@ import torch
 import numpy as np
 import gc
 import click
-from tabulate import tabulate
+from rich.console import Console
+from rich.table import Table
 import matplotlib.pyplot as plt
-from agent_eval.benchmarks.latency import LatencyBenchmark
-from agent_eval.benchmarks.mmlu import MMLUBenchmark
-from agent_eval.benchmarks.parameters import CountParametersBenchmark
-from agent_eval.benchmarks.perplexity import PerplexityBenchmark
-from agent_eval.benchmarks.rouge_l import RougeScoreBenchmark
-from agent_eval.benchmarks.tokens_per_second import TokensPerSecondBenchmark
-from agent_eval.benchmarks.final_score import FinalScore
-from agent_eval.load_model import load_test_model
+from benchmarks.latency import LatencyBenchmark
+from benchmarks.parameters import CountParametersBenchmark
+from benchmarks.perplexity import PerplexityBenchmark
+from benchmarks.tokens_per_second import TokensPerSecondBenchmark
+from load_model import load_test_model
 
 
 model_metrics = [
@@ -51,19 +49,29 @@ model_metrics = [
     },
 ]
 
-tasks = {
-    "data_augmentation": ["latency", "tokens_per_second", "parameters", "perplexity", "rouge_score"],
-    "data_mixture": ["latency", "tokens_per_second", "parameters"],
-    "decoding": ["latency", "tokens_per_second", "parameters"],
-    "hyperparameter_tuning": ["latency", "tokens_per_second", "parameters"],
-    "knowledge_distillation": ["latency", "tokens_per_second", "parameters"],
-    "mixture_of_experts": ["latency", "tokens_per_second", "parameters"],
-    "pretraining_efficiency": ["latency", "tokens_per_second", "parameters"],
-    "pretraining_perplexity": ["perplexity", "parameters"],
-    "quantization": ["latency", "tokens_per_second", "parameters"],
-    "sparse_attention": ["latency", "tokens_per_second", "parameters"],
-    "text_generation": ["rouge_score", "tokens_per_second", "parameters"],
+tasks = {    
+    "llm_efficiency": ["latency", "tokens_per_second", "parameters", "perplexity"],
+    "baby_lm": ["latency", "tokens_per_second", "parameters", "perplexity"],
+    "mini_pile": ["latency", "tokens_per_second", "parameters", "perplexity"],
+    "budget_model_training": ["latency", "tokens_per_second", "parameters", "perplexity"],
+    "budget_model_inference": ["latency", "tokens_per_second", "parameters", "perplexity"],
+    "llm_merging": ["latency", "tokens_per_second", "parameters", "perplexity"],
+    "edge_llm_compression": ["latency", "tokens_per_second", "parameters", "perplexity"],
+    "edge_llm_training": ["latency", "tokens_per_second", "parameters", "perplexity"],
+    "math_reasoning": ["latency", "tokens_per_second", "parameters", "perplexity"],
+    # mini tasks
+    "mini_llm_efficiency": ["latency", "tokens_per_second", "parameters", "perplexity"],
+    "mini_baby_lm": ["latency", "tokens_per_second", "parameters", "perplexity"],
+    "mini_mini_pile": ["latency", "tokens_per_second", "parameters", "perplexity"],
+    "mini_budget_model_training": ["latency", "tokens_per_second", "parameters", "perplexity"],
+    "mini_budget_model_inference": ["latency", "tokens_per_second", "parameters", "perplexity"],
+    "mini_llm_merging": ["latency", "tokens_per_second", "parameters", "perplexity"],
+    "mini_edge_llm_compression": ["latency", "tokens_per_second", "parameters", "perplexity"],
+    "mini_edge_llm_training": ["latency", "tokens_per_second", "parameters", "perplexity"],
+    "mini_math_reasoning": ["latency", "tokens_per_second", "parameters", "perplexity"],
 }
+
+
 
 
 def plot_results(metrics, model_name, task):
@@ -94,19 +102,18 @@ def cli():
 
 
 @click.command()
-@click.option('--model_path', required=True, type=str, help='Path to the model')
+@click.option('--model_args', required=True, type=str, help='Path to the model')
 @click.option('--task', required=True, type=click.Choice(list(tasks.keys())), help='Task to perform')
 @click.option('--bits', required=False, type=int, help='True if the model is quantized with bitsandbytes')
 @click.option('--use_ort', required=False, type=bool, help='True if the model is quantized with ORT')
 @click.option('--quantized', required=False, type=bool, help='True if the model is quantized')
-def cli(model_path, task, bits, use_ort, quantized):    
-    print("Running model analysis on path: ", model_path)
-    task = "data_augmentation"
+def cli(model_args, task, bits, use_ort, quantized):    
+    print("Running model analysis on path: ", model_args)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     # Load a non-quantized model
-    model, tokenizer = load_test_model(model_path, bits=bits, use_ort=use_ort, quantized=quantized)
+    model, tokenizer = load_test_model(model_args, bits=bits, use_ort=use_ort, quantized=quantized)
 
     results = []
     rubric_results = []
@@ -186,29 +193,6 @@ def cli(model_path, task, bits, use_ort, quantized):
         
         rubric_results.append(["latency", latency_result['avg']])
 
-    ########################################### rouge_score #################################################################
-    if "rouge_score" in tasks[task]:
-        print("Starting ROUGE-L benchmark")
-        rouge_benchmark = RougeScoreBenchmark(
-            model,
-            tokenizer,
-            dataset_name="cnn_dailymail",
-            dataset_config="3.0.0",
-            num_samples=100,
-        )
-        rouge_result = rouge_benchmark.benchmark_rouge_score()
-        #         print(f"\nROUGE-1 score on {self.num_samples} samples: {rouge_scores['rouge1']:.4f}")
-        # print(f"ROUGE-2 score on {self.num_samples} samples: {rouge_scores['rouge2']:.4f}")
-        # print(f"ROUGE-L score on {self.num_samples} samples: {rouge_scores['rougeL']:.4f}")
-        results.append(["ROUGE-1 Score", f"{rouge_result['rouge1']:.4f}"])
-        results.append(["ROUGE-2 Score", f"{rouge_result['rouge2']:.4f}"])
-        results.append(["ROUGE-L Score", f"{rouge_result['rougeL']:.4f}"])
-        
-        #results.append(["ROUGE-L Score", f"{rouge_result['rouge_l_score']:.4f}"])
-        print("ROUGE-L benchmark complete")
-        
-        rubric_results.append(["rouge_score", rouge_result['rougeL']])
-
     if "mmlu" in tasks[task]:
         print("Starting MMLU benchmark")
         benchmark_name = (
@@ -225,11 +209,18 @@ def cli(model_path, task, bits, use_ort, quantized):
 
     print("\n")
     print("Benchmark Results:")
-    print(tabulate(results, headers=["Metric", "Value"]))
+    
+    console = Console()
+    table = Table(title="Benchmark Results")
+    table.add_column("Metric", style="cyan")
+    table.add_column("Value", style="magenta")
+
+    for metric, value in results:
+        table.add_row(metric, value)
+
+    console.print(table)
     print("\n")
-    # (self, results, num_tokens, time_in_seconds, task, model_averages):
-    model_averages = model_metrics[1]
-    calc_score = FinalScore(rubric_results, num_tokens=1000, time_in_seconds=1800, task=tasks[task], model_averages=model_averages).calculate_final_score()
-    final_score = calc_score.calculate_final_score()
-    print(final_score)
-    print("\n") 
+
+    
+if __name__ == "__main__":
+    cli()
