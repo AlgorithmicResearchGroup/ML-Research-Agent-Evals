@@ -11,7 +11,7 @@ setup(
     author='Algorithmic Research Group',  # Your name or your organization's name
     author_email='matt@algorithmicresearchgroup.com',  # Your email or your organization's email
     keywords='Eval',  # Keywords to find your library
-    url='http://github.com/yourusername/your_library',  # URL to your library's repository
+    url='http://github.com/AlgorithmicResearchGroup/agent-eval',  # URL to your library's repository
     entry_points={
         'console_scripts': [
             'agent-eval=agent_eval.cli:cli'  # This allows you to run `agent` command directly from the terminal
