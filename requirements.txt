@@ -1,6 +1,5 @@
 click
 tabulate
-matplotlib
 evaluate
 datasets
 transformers
@@ -10,7 +9,7 @@ onnx
 onnxruntime
 urllib3<2
 rouge_score
-protobuf==3.20.2
+protobuf
 accelerate
 rich
 optimum
