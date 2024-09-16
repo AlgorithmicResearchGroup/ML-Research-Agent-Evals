@@ -6,29 +6,16 @@ Evaluations can either be performed manually or automatically. The manual evalua
 
 ## Setup
 
-1. Build the Docker image:
-   ```
-   docker build -t agent-eval .
-   ```
+```
+pip install agent-eval 
+```
 
-2. Run the evaluation for a specific task:
-   ```
-   docker run -v [task_name] [model_path] [results_output_path]
+## Usage
 
+```
+agent-eval --model_args <path_to_your_model> --task <task_name>
+```
 
-   docker run -it agent-eval \
-    --gpus all \
-    -e NVIDIA_VISIBLE_DEVICES=0 \
-    -e TASK_NAME="mini_mini_pile" \
-    -e MODEL_PATH="gpt2" \ 
-   ```
-
-   example:
-    ```
-  docker run llm_efficiency gpt2 .
-   ```
-
-   Replace `[task_name]` with one of the available tasks, `[model_path]` with the path to your model, and `[results_output_path]` with the desired output location for results.
 
 ## Available Tasks
 
@@ -76,16 +63,10 @@ To run the `llm_efficiency` task on a model:
 
 
 ```
-docker run -v /path/to/models:/models agent-eval llm_efficiency /models/my_model 
+agent-eval --model_args /path/to/model --task llm_efficiency
 ```
 
 This will:
 1. Run the custom `agent_eval` metrics (latency, tokens per second, parameters, perplexity)
 2. Run the hellaswag benchmark using `lm-eval-harness`
 3. Display the custom metrics in the console
-
-## Note
-
-- Ensure that you have sufficient GPU resources available when running GPU-based evaluations.
-- The evaluation process now includes more comprehensive benchmarks, which may take longer to complete depending on the task and model size.
-- Review the `run.sh` script for any task-specific configurations or additional benchmarks that may be run for each task.
