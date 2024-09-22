@@ -70,3 +70,12 @@ This will:
 1. Run the custom `agent_eval` metrics (latency, tokens per second, parameters, perplexity)
 2. Run the hellaswag benchmark using `lm-eval-harness`
 3. Display the custom metrics in the console
+
+
+## Contributing
+
+We welcome contributions to the ML Research Benchmark! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to submit issues, feature requests, and pull requests.
+
+## License
+
+This project is licensed under the AGPL-3.0 License - see the [LICENSE](LICENSE) file for details.
